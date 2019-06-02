@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HomePage</title>
+</head>
+<body>
+    <h1>欢迎用户:__email__</h1>
+    <h1>你的密码是:__password__</h1>
+    <button id="clearCookie">退出登陆</button>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="./main.js?version=2"></script>
+    <script>
+        // update message
+        let already = localStorage.getItem('already',true);
+        if(!already){
+            localStorage.setItem('already',true);
+            alert('我们的网站更新啦~更新的内容有：...');
+        }
+
+        // 退出登陆时清空 cookie
+        $('#clearCookie').on('click',()=>{
+            deleteCookie();
+            window.location.href = '/login';
+        })
+        function deleteCookie (){
+            // 设置让 cookie 无效的方法 让cookie的期限 expires 为 现在
+            document.cookie = 'sessionId =; expires='+new Date().toGMTString();
+        }
+    </script>
+</body>
+</html>

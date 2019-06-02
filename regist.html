@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <style>
+        *{margin: 0;padding: 0;box-sizing: border-box;}
+        body{height: 100vh;display: flex;justify-content: center;align-items: center;}
+        .formWrapper{background: lightskyblue; }
+        .titleWrapper{text-align: center;margin: 20px 0;}
+        .regist > .row{margin: 1.2em 40px;}
+        .regist > .row > label{display: inline-block;width: 5em;}
+        .regist > .row > span{display: block;font-size: 12px;margin-top: 2px;margin-left: 7em;height: 1px;color: red;}
+    </style>
+</head>
+<body>
+    <div class="formWrapper">
+        <div class="titleWrapper"><h1>注册</h1></div>
+        <form class="regist">
+            <div class="row">
+                <label>邮箱</label>
+                <input type="text" name="email">
+                <span class="error"></span>
+            </div>
+            <div class="row">
+                <label>密码</label>
+                <input type="password" name="password">
+                <span class="error"></span>
+            </div>
+            <div class="row">
+                <label>确认密码</label>
+                <input type="password" name="passwordConfirm">
+                <span class="error"></span>
+            </div>
+            <div class="row">
+                <input type="submit" value="注册">
+            </div>
+        </form>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        let $form = $('.regist');
+        $form.on('submit',(e)=>{
+            init(e);
+            
+            let emailVal = $form.find('[name="email"]').val();
+            let passwordVal = $form.find('[name="password"]').val();
+            let passwordConfirmVal = $form.find('[name="passwordConfirm"]').val();
+
+            // data  
+            let userMessage = {
+                'email':emailVal,
+                'password':passwordVal,
+                'passwordConfirm':passwordConfirmVal
+            }
+            // 未输入邮箱
+            if(emailVal === ''){
+                errorText("email","请输入邮箱");
+                return
+            }
+
+            // 邮箱格式错误: 邮箱中没有'@'
+            if(emailVal.indexOf('@') === -1){
+                errorText("email","邮箱格式错误");
+                return         
+            }
+            // 未输入密码
+            if(passwordVal === ''){
+                errorText("password","请输入密码");
+                return        
+            }
+            
+            // 未确认密码
+            if(passwordConfirmVal === ''){
+                errorText("passwordConfirm","请再次确认密码");
+                return 
+            }
+            // 两次输入密码不一致
+            if(passwordVal !== passwordConfirmVal){
+                errorText("passwordConfirm","两次输入密码不一致");
+                return        
+            }
+
+
+            // ajax post
+            $.post('/regist',userMessage)
+                .then(
+                    // success
+                    ()=>{
+                        // 跳转至 login 页面
+                        window.location.href = '/login'
+                    },
+                    // fail
+                    (request)=>{
+                        let errorMessage = request.responseJSON.errors.error;
+                        if(errorMessage === 'userAlreadyExist'){
+                            errorText("email","用户已存在");
+                            return
+                        }
+                        
+                    }
+                )
+        })
+
+
+        function init(e){
+            // 阻止表单默认的提交事件
+            e.preventDefault();
+            let $spans = $form.find('[class="error"]');
+            for(let i=0;i<$spans.length;i++){
+                $spans[i].innerText = '';
+            }
+        }
+
+        function errorText(name,str){
+            $form.find(`[name=${name}]`)
+                    .siblings('.error')
+                    .text(str);        
+        }
+    </script>
+</body>
+</html>
